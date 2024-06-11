@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/batch https://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <job id="ioSampleJob" xmlns="http://www.springframework.org/schema/batch">
+        <step id="step1">
+            <tasklet>
+                <chunk reader="itemReader" processor="itemProcessor" writer="itemWriter"
+                             commit-interval="2"/>
+            </tasklet>
+        </step>
+    </job>
+
+    <bean id="itemProcessor"
+          class="com.sample.filejob.PersonItemProcessor"/>
+
+    <!--
+    <bean id="itemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="sql" value="select ID, NAME, CREDIT from CUSTOMER"/>
+        <property name="verifyCursorPosition" value="true"/>
+        <property name="rowMapper">
+            <bean class="org.springframework.batch.samples.domain.trade.internal.CustomerCreditRowMapper"/>
+        </property>
+    </bean>
+    -->
+
+    <bean id="person" class="com.sample.filejob.Person" scope="prototype" />
+
+    <bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
+        <property name="lineMapper">
+            <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+                <property name="lineTokenizer">
+                    <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+                        <property name="delimiter" value=","/>
+                        <property name="names" value="firstName,lastName" />
+                    </bean>
+                </property>
+
+                <property name="fieldSetMapper">
+                    <bean class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+                        <property name="prototypeBeanName" value="person" />
+                    </bean>
+                </property>
+
+
+<!--                <property name="fieldSetMapper">-->
+<!--                    <bean class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">-->
+<!--                        <property name="targetType" value="com.example.batchprocessing.Person" />-->
+<!--                    </bean>-->
+<!--                </property>-->
+
+<!--                <property name="fieldSetMapper">-->
+<!--                    <bean class="com.example.batchprocessing.Person" />-->
+<!--                </property>                -->
+            </bean>
+        </property>
+        <property name="resource" value="classpath:sample-data.csv" />
+    </bean>
+
+    <bean id="itemWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
+        <property name="assertUpdates" value="true"/>
+        <property name="itemSqlParameterSourceProvider">
+            <bean class="org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider"/>
+        </property>
+        <property name="sql" value="INSERT INTO people (first_name, last_name) VALUES (:firstName, :lastName)"/>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+
+<!--    <batch:job-repository id="jobRepository" table-prefix="BATCH_"/>-->
+
+<!--    <bean id="taskExecutor" class="org.springframework.core.task.SyncTaskExecutor" />-->
+
+<!--    <bean id="jobLauncher"-->
+<!--          class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">-->
+<!--        <property name="jobRepository" ref="jobRepository" />-->
+<!--    </bean>-->
+
+<!--    <bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">-->
+<!--        <property name="jobRegistry" ref="jobRegistry"/>-->
+<!--    </bean>-->
+
+
+</beans>

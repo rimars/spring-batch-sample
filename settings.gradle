@@ -1,0 +1,5 @@
+rootProject.name = 'batch-sample'
+include 'file-xmlconfig'
+include 'file-bean'
+include 'job-sample'
+

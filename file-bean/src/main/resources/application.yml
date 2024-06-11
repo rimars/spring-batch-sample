@@ -1,0 +1,23 @@
+spring:
+#  batch:
+#    names: ioSampleJob
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true    # localhost:8080/h2-console
+      path: /h2-console
+      settings:
+        trace: false
+        web-others: false
+
+logging:
+  level:
+    root: debug
