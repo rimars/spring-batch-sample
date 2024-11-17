@@ -16,10 +16,11 @@ dependencies {
     implementation(project(":job-sample"))
     implementation("org.springframework.boot:spring-boot-starter-batch")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
 
     implementation("org.apache.commons:commons-dbcp2:2.12.0")
 
-    runtimeOnly ("com.h2database:h2")
+    runtimeOnly ("org.hsqldb:hsqldb:2.7.2")
 
     testImplementation ("org.springframework.boot:spring-boot-starter-test")
     testImplementation ("org.springframework.batch:spring-batch-test")

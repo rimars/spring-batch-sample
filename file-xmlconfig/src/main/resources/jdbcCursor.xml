@@ -9,8 +9,7 @@
     <job id="ioSampleJob" xmlns="http://www.springframework.org/schema/batch">
         <step id="step1">
             <tasklet>
-                <chunk reader="itemReader" processor="itemProcessor" writer="itemWriter"
-                             commit-interval="2"/>
+                <chunk reader="itemReader" processor="itemProcessor" writer="itemWriter" commit-interval="2"/>
             </tasklet>
         </step>
     </job>
@@ -59,7 +58,12 @@
 <!--                </property>                -->
             </bean>
         </property>
-        <property name="resource" value="classpath:sample-data.csv" />
+<!--        <property name="resource" value="classpath:sample-data.csv" />-->
+        <property name="resource">
+            <bean class="org.springframework.core.io.FileSystemResource">
+                <constructor-arg value="#{jobParameters['inputFile']}"/>
+            </bean>
+        </property>
     </bean>
 
     <bean id="itemWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">

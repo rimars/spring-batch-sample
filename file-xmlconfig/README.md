@@ -34,6 +34,10 @@ Spring Boot 2에서 버그 발생
 
 
 
+org.springframework.batch.core.launch.support.CommandLineJobRunner simple-job-launcher-context.xml ioSampleJob inputFile=D:/source/batch/gs-batch-processing/complete/src/main/resources/sample-data.csv
+
+
+
 
 SpringBoot 3 부터는 spring.batch.job.enabled=true 일 때, jobName 누락하더라도 전체 job이 실행되지 않는다.
 SpringBoot 2 까지는 spring.batch.job.enabled=false로 만들어야 jobName을 누락하는 경우 전체 job 실행되지 않았던 것 같은데,

@@ -5,6 +5,7 @@ import com.sample.filejob.PersonItemProcessor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobScope;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -15,6 +16,7 @@ import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import javax.sql.DataSource;
@@ -47,10 +49,11 @@ public class BatchConfiguration {
 
 	// tag::readerwriterprocessor[]
 	@Bean
-	public FlatFileItemReader<Person> reader() {
+	@StepScope // Step 실행 시 동적으로 JobParameter를 주입받기 위해 필요
+	public FlatFileItemReader<Person> reader(@Value("#{jobParameters['inputFile']}") String inputFile) {
 		return new FlatFileItemReaderBuilder<Person>()
 			.name("personItemReader")
-			.resource(new ClassPathResource("sample-data.csv"))  // TODO
+			.resource(new FileSystemResource(inputFile))
 			.delimited()
 			.names("firstName", "lastName")
 			.targetType(Person.class)
