@@ -4,7 +4,7 @@
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<import resource="data-source-context.xml" />
+	<import resource="classpath:data-source-context.xml" />
 
 	<bean id="jobLauncher"
 		class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">
@@ -31,9 +31,9 @@
 	<bean id="jobRegistry"
 		class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
 
-	<bean class="org.springframework.batch.test.JobLauncherTestUtils"/>
-	<bean class="org.springframework.batch.test.context.BatchTestContextBeanPostProcessor"/>
+<!--	<bean class="org.springframework.batch.test.JobLauncherTestUtils"/>-->
+<!--	<bean class="org.springframework.batch.test.context.BatchTestContextBeanPostProcessor"/>-->
 
-<!--	<import resource="jdbcCursor.xml" />-->
+	<import resource="classpath:jdbcCursor.xml" />
 
 </beans>

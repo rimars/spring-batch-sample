@@ -9,14 +9,12 @@
     <job id="ioSampleJob" xmlns="http://www.springframework.org/schema/batch">
         <step id="step1">
             <tasklet>
-                <chunk reader="itemReader" processor="itemProcessor" writer="itemWriter"
-                             commit-interval="2"/>
+                <chunk reader="itemReader"  writer="itemWriter" commit-interval="2"/>
             </tasklet>
         </step>
     </job>
 
-    <bean id="itemProcessor"
-          class="com.sample.filejob.PersonItemProcessor"/>
+    <bean id="itemProcessor" class="com.sample.filejob.PersonItemProcessor"/>
 
     <!--
     <bean id="itemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
@@ -60,6 +58,7 @@
             </bean>
         </property>
         <property name="resource" value="classpath:sample-data.csv" />
+<!--        <property name="resource" value="#{jobParameters['inputFile']}" />-->
     </bean>
 
     <bean id="itemWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
@@ -71,19 +70,55 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
+    <!--
+    ############
+    #### AIS
+    ############
+    -->
 
-<!--    <batch:job-repository id="jobRepository" table-prefix="BATCH_"/>-->
+    <job id="aisDynamicJob" xmlns="http://www.springframework.org/schema/batch">
+        <step id="aisStep1">
+            <tasklet>
+                <chunk reader="aisItemReader"  writer="aisItemWriter" commit-interval="1000"/>
+            </tasklet>
+        </step>
+    </job>
 
-<!--    <bean id="taskExecutor" class="org.springframework.core.task.SyncTaskExecutor" />-->
+    <bean id="aisDynamic" class="com.example.dto.AisDynamic" scope="prototype" />
 
-<!--    <bean id="jobLauncher"-->
-<!--          class="org.springframework.batch.core.launch.support.TaskExecutorJobLauncher">-->
-<!--        <property name="jobRepository" ref="jobRepository" />-->
-<!--    </bean>-->
+    <bean id="aisItemReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
+        <property name="lineMapper">
+            <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+                <property name="lineTokenizer">
+                    <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+                        <property name="delimiter" value=","/>
+                        <property name="names" value="mmsi,ais_dt,m_latitude,m_longitude,sog,cog,heading" />
+                    </bean>
+                </property>
 
-<!--    <bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">-->
-<!--        <property name="jobRegistry" ref="jobRegistry"/>-->
-<!--    </bean>-->
+                <property name="fieldSetMapper">
+                    <bean class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+                        <property name="prototypeBeanName" value="aisDynamic" />
+                    </bean>
+                </property>
+            </bean>
+        </property>
 
+        <property name="resource">
+            <bean class="org.springframework.core.io.FileSystemResource">
+                <constructor-arg value="#{jobParameters['inputFile']}"/>
+            </bean>
+        </property>
+        <property name="linesToSkip" value="3"/>
+    </bean>
+
+    <bean id="aisItemWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
+        <property name="assertUpdates" value="true"/>
+        <property name="itemSqlParameterSourceProvider">
+            <bean class="org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider"/>
+        </property>
+        <property name="sql" value="INSERT INTO ais_dynamic (mmsi,ais_dt,m_latitude,m_longitude,sog,cog,heading) VALUES (:mmsi,:ais_dt,:m_latitude,:m_longitude,:sog,:cog,:heading)"/>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
 
 </beans>

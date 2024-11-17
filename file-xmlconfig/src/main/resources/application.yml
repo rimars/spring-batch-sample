@@ -1,6 +1,7 @@
 spring:
-#  batch:
-#    names: ioSampleJob
+  batch:
+    job:
+      names: aisDynamicJob
   main:
     allow-bean-definition-overriding: true
   datasource:
